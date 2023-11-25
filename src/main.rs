@@ -368,7 +368,9 @@ fn main() {
             // let mytick = tick.start.elapsed().as_nanos();
             // if mytick > counter {
                 // counter = mytick;
+                if tick.start.elapsed().as_nanos()%2 ==0{
                 right = !right;
+                }
             // }
             if right {
                 filter_rotate_right(&mut canvas_clock);
