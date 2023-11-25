@@ -365,11 +365,11 @@ fn main() {
             // filter_darken(&mut canvas_clock, 0.003922);
             // filter_red(&mut canvas_clock);
             client.send_brightness(1);
-            let mytick = tick.start.elapsed().as_nanos();
-            if mytick > counter + 3 {
-                counter = mytick;
+            // let mytick = tick.start.elapsed().as_nanos();
+            // if mytick > counter {
+                // counter = mytick;
                 right = !right;
-            }
+            // }
             if right {
                 filter_rotate_right(&mut canvas_clock);
             } else {
