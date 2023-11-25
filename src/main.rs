@@ -294,7 +294,7 @@ fn filter_red(canvas: &mut Canvas) {
     }
 }
 
-fn filter_red_dark(canvas: &mut Canvas) {
+fn filter_quarter(canvas: &mut Canvas) {
     for y in 0..canvas.height {
         for x in 0..canvas.width {
             let mut curr_pixel: f32 = canvas.get_pixel(x, y)[0];
@@ -376,6 +376,7 @@ fn main() {
         if hists.load(Ordering::Acquire) <= 24 {
             // filter_darken(&mut canvas_clock, 0.003922);
             // filter_red(&mut canvas_clock);
+            filter_quarter(&mut canvas_clock);
             client.send_brightness(1);
             // let mytick = tick.start.elapsed().as_nanos();
             // if mytick > counter {
@@ -397,7 +398,6 @@ fn main() {
             // let mut canvas4 = canvas_wave.clone();
             // filter_background(&mut canvas3, &mut canvas2);
             // filter_bright_foreground(&mut canvas4, &mut canvas_wave, 0.01);
-
             filter_bright_background(&mut canvas_wave, &mut canvas_clock, 0.1);
             if shifter == (SHIFTER_START * (-1.0)) {
                 shifter = SHIFTER_START;
