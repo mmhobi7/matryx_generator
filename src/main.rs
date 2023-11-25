@@ -365,8 +365,8 @@ fn main() {
             // filter_darken(&mut canvas_clock, 0.003922);
             // filter_red(&mut canvas_clock);
             client.send_brightness(1);
-            let mytick = tick.start.elapsed().as_millis();
-            if mytick > counter + 5 {
+            let mytick = tick.start.elapsed().as_nanos();
+            if mytick > counter + 10 {
                 counter = mytick;
                 right = !right;
             }
