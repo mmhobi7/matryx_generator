@@ -13,7 +13,7 @@ use std::{
         Arc,
     },
     thread::{self, sleep},
-    time::{self, Duration, Instant},
+    time::{self, Duration},
 };
 
 use v4l::buffer::Type;
@@ -44,7 +44,6 @@ struct FrameTimer {
 struct FrameTick {
     start: time::Instant,
     instant: time::Instant,
-    delta: time::Duration,
 
     t: f32,
     dt: f32,
@@ -57,7 +56,6 @@ impl FrameTick {
         FrameTick {
             start: now,
             instant: now,
-            delta: time::Duration::from_millis(0),
             t: 0.0,
             dt: 0.0,
         }
@@ -73,7 +71,6 @@ impl FrameTick {
         FrameTick {
             start,
             instant,
-            delta,
             t,
             dt,
         }
@@ -329,6 +326,7 @@ fn filter_rotate_right(canvas: &mut Canvas) {
 
 const CAMERA_ON: bool = true;
 const SHIFTER_START: f32 = -180.0;
+const CAMERA_FRAME_DELAY: time::Duration = time::Duration::from_millis((500));
 
 fn main() {
     let client = MatrixClient::new(MatrixClientSettings {
@@ -403,7 +401,7 @@ fn cam_thread_loop(hists_clone: Arc<AtomicU8>) {
             }
             Err(e) => {
                 warn!("Camera Error: {e:?}");
-                if attempt == std::i8::MAX {
+                if attempt >= std::i8::MAX {
                     attempt = 1;
                 } else {
                     attempt = attempt + 1;
@@ -491,13 +489,8 @@ fn cam_thread(hists_clone: Arc<AtomicU8>, attempt: i8) -> Result<i32, i32> {
     // We can now read frames (represented as buffers) by iterating through
     // the stream. Once an error condition occurs, the iterator will return
     // None.
-    let count = 1;
-    let frame_delay = time::Duration::from_millis(500);
 
     loop {
-        let rstart = Instant::now();
-        debug!("grab next image");
-        let mut start = Instant::now();
         let _ = stream.next();
         let (buf, _) = {
             let this = stream.next();
@@ -509,9 +502,6 @@ fn cam_thread(hists_clone: Arc<AtomicU8>, attempt: i8) -> Result<i32, i32> {
                 }
             }
         };
-        let duration_us = start.elapsed().as_micros();
-        debug!("next image grabbed {}", duration_us);
-        start = Instant::now();
         let data = match &format.fourcc.repr {
             b"RGB3" => buf.to_vec(),
             b"MJPG" => {
@@ -524,27 +514,11 @@ fn cam_thread(hists_clone: Arc<AtomicU8>, attempt: i8) -> Result<i32, i32> {
                 return Err(-2);
             }
         };
-        let duration_us = start.elapsed().as_micros();
-        debug!("vectorized, {}", duration_us);
-        start = Instant::now();
         let img: ImageBuffer<image::Rgb<u8>, Vec<u8>> =
             ImageBuffer::from_raw(format.width, format.height, data).unwrap();
-        let duration_us = start.elapsed().as_micros();
-        debug!("wrapped to image buffer{}", duration_us);
-        start = Instant::now();
         let luma = DynamicImage::ImageRgb8(img).into_luma8();
-        let duration_us = start.elapsed().as_micros();
-        debug!("luma'd {}", duration_us);
-        start = Instant::now();
         let val = percentile(&luma, 90);
-        let duration_us = start.elapsed().as_micros();
-        debug!("percentile'd {}", duration_us);
-        start = Instant::now();
         hists_clone.store(val, Ordering::Relaxed);
-        let duration_us = start.elapsed().as_micros();
-        debug!("stored {} and {}", val, duration_us);
-        debug!("FPS1: {}", count as f64 / rstart.elapsed().as_secs_f64());
-        thread::sleep(frame_delay);
-        debug!("FPS2: {}", count as f64 / rstart.elapsed().as_secs_f64());
+        thread::sleep(CAMERA_FRAME_DELAY);
     }
 }
