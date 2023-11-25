@@ -6,7 +6,7 @@ use led_matrix_zmq::client::{MatrixClient, MatrixClientSettings};
 
 use jpeg_decoder as jpeg;
 use log2::*;
-use palette::{rgb::Rgb, FromColor, Hsl, IntoColor, Lch, ShiftHue, Srgb, white_point::E};
+use palette::{rgb::Rgb, FromColor, Hsl, IntoColor, Lch, ShiftHue, Srgb};
 use std::{
     sync::{
         atomic::{AtomicU8, Ordering},
@@ -315,7 +315,6 @@ fn filter_rotate_right(canvas: &mut Canvas) {
     canvas.pixels.rotate_right(1);
 }
 
-
 const CAMERA_ON: bool = true;
 const SHIFTER_START: f32 = -180.0;
 
@@ -356,7 +355,8 @@ fn main() {
     }
 
     let mut shifter: f32 = SHIFTER_START;
-
+    let mut counter: u64 = 0;
+    let mut right: bool = false;
     loop {
         let tick = frame_timer.tick();
         clock_scene.tick(&mut canvas_clock, &tick);
@@ -365,10 +365,17 @@ fn main() {
             // filter_darken(&mut canvas_clock, 0.003922);
             // filter_red(&mut canvas_clock);
             client.send_brightness(10);
-            if tick.start.elapsed().as_nanos()%2 == 0 {
+            let mytick: u64 = tick.start.elapsed().as_secs();
+            if mytick > counter + 5 {
+                counter = mytick;
+                right = !right;
+            }
+            if right {
                 filter_rotate_right(&mut canvas_clock);
+                client.send_brightness(3);
             } else {
                 filter_rotate_left(&mut canvas_clock);
+                client.send_brightness(100);
             }
             client.send_frame(canvas_clock.pixels());
         } else {
