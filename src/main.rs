@@ -366,7 +366,7 @@ fn main() {
             // filter_red(&mut canvas_clock);
             client.send_brightness(1);
             let mytick = tick.start.elapsed().as_nanos();
-            if mytick > counter + 10 {
+            if mytick > counter + 3 {
                 counter = mytick;
                 right = !right;
             }
