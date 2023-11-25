@@ -355,7 +355,7 @@ fn main() {
     }
 
     let mut shifter: f32 = SHIFTER_START;
-    let mut counter: u64 = 0;
+    let mut counter = 0;
     let mut right: bool = false;
     loop {
         let tick = frame_timer.tick();
@@ -364,18 +364,16 @@ fn main() {
         if hists.load(Ordering::Acquire) <= 24 {
             // filter_darken(&mut canvas_clock, 0.003922);
             // filter_red(&mut canvas_clock);
-            client.send_brightness(10);
-            let mytick: u64 = tick.start.elapsed().as_secs();
+            client.send_brightness(1);
+            let mytick = tick.start.elapsed().as_millis();
             if mytick > counter + 5 {
                 counter = mytick;
                 right = !right;
             }
             if right {
                 filter_rotate_right(&mut canvas_clock);
-                client.send_brightness(3);
             } else {
                 filter_rotate_left(&mut canvas_clock);
-                client.send_brightness(100);
             }
             client.send_frame(canvas_clock.pixels());
         } else {
@@ -391,7 +389,7 @@ fn main() {
             } else {
                 shifter = shifter + 1.0;
             }
-            // filter_hue_shift(&mut canvas_wave, shifter);
+            filter_hue_shift(&mut canvas_wave, shifter);
             client.send_brightness(100);
             filter_rotate_right(&mut canvas_wave);
             client.send_frame(canvas_wave.pixels());
