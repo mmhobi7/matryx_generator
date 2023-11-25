@@ -294,6 +294,18 @@ fn filter_red(canvas: &mut Canvas) {
     }
 }
 
+fn filter_red_dark(canvas: &mut Canvas) {
+    for y in 0..canvas.height {
+        for x in 0..canvas.width {
+            let mut curr_pixel: f32 = canvas.get_pixel(x, y)[0];
+            if curr_pixel > 0.0 {
+                curr_pixel = 63.75/255.0;
+            }
+            canvas.set_pixel(x, y, curr_pixel, curr_pixel, curr_pixel);
+        }
+    }
+}
+
 fn filter_hue_shift(canvas: &mut Canvas, shift: f32) {
     for y in 0..canvas.height {
         for x in 0..canvas.width {
@@ -377,6 +389,7 @@ fn main() {
             } else {
                 filter_rotate_left(&mut canvas_clock);
             }
+            filter_red_dark(&mut canvas_clock);
             client.send_frame(canvas_clock.pixels());
         } else {
             scene.tick(&mut canvas_wave, &tick);
