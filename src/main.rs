@@ -319,14 +319,6 @@ fn filter_hue_shift(canvas: &mut Canvas, shift: f32) {
     }
 }
 
-fn filter_rotate_left(canvas: &mut Canvas) {
-    canvas.pixels.rotate_left(1);
-}
-
-fn filter_rotate_right(canvas: &mut Canvas) {
-    canvas.pixels.rotate_right(1);
-}
-
 const CAMERA_ON: bool = true;
 const SHIFTER_START: f32 = -180.0;
 
@@ -367,8 +359,7 @@ fn main() {
     }
 
     let mut shifter: f32 = SHIFTER_START;
-    let mut counter = 0;
-    let mut right: bool = false;
+
     loop {
         let tick = frame_timer.tick();
         clock_scene.tick(&mut canvas_clock, &tick);
@@ -378,19 +369,6 @@ fn main() {
             // filter_red(&mut canvas_clock);
             filter_quarter(&mut canvas_clock);
             client.send_brightness(1);
-            // let mytick = tick.start.elapsed().as_nanos();
-            // if mytick > counter {
-                // counter = mytick;
-                if tick.start.elapsed().as_nanos()%2 ==0{
-                right = !right;
-                }
-            // }
-            if right {
-                filter_rotate_right(&mut canvas_clock);
-            } else {
-                filter_rotate_left(&mut canvas_clock);
-            }
-            filter_red_dark(&mut canvas_clock);
             client.send_frame(canvas_clock.pixels());
         } else {
             scene.tick(&mut canvas_wave, &tick);
@@ -398,15 +376,14 @@ fn main() {
             // let mut canvas4 = canvas_wave.clone();
             // filter_background(&mut canvas3, &mut canvas2);
             // filter_bright_foreground(&mut canvas4, &mut canvas_wave, 0.01);
-            filter_bright_background(&mut canvas_wave, &mut canvas_clock, 0.1);
+filter_bright_background(&mut canvas_wave, &mut canvas_clock, 0.1);
             if shifter == (SHIFTER_START * (-1.0)) {
                 shifter = SHIFTER_START;
             } else {
                 shifter = shifter + 1.0;
             }
             filter_hue_shift(&mut canvas_wave, shifter);
-            client.send_brightness(100);
-            filter_rotate_right(&mut canvas_wave);
+                        client.send_brightness(100);
             client.send_frame(canvas_wave.pixels());
         }
         frame_timer.wait_for_next_frame();
