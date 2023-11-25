@@ -367,7 +367,7 @@ fn main() {
         if hists.load(Ordering::Acquire) <= 24 {
             // filter_darken(&mut canvas_clock, 0.003922);
             // filter_red(&mut canvas_clock);
-            filter_red_dark(&mut canvas_clock);
+            filter_red(&mut canvas_clock);
             client.send_brightness(1);
             client.send_frame(canvas_clock.pixels());
         } else {
