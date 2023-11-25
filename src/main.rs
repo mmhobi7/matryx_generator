@@ -299,7 +299,7 @@ fn filter_red_dark(canvas: &mut Canvas) {
         for x in 0..canvas.width {
             let mut curr_pixel: f32 = canvas.get_pixel(x, y)[0];
             if curr_pixel > 0.0 {
-                curr_pixel = 25.5/255.0;
+                curr_pixel = 127.5/255.0;
             }
             canvas.set_pixel(x, y, curr_pixel, 0.0, 0.0);
         }
@@ -367,7 +367,7 @@ fn main() {
         if hists.load(Ordering::Acquire) <= 24 {
             // filter_darken(&mut canvas_clock, 0.003922);
             // filter_red(&mut canvas_clock);
-            filter_red(&mut canvas_clock);
+            filter_red_dark(&mut canvas_clock);
             client.send_brightness(1);
             client.send_frame(canvas_clock.pixels());
         } else {
