@@ -17,7 +17,7 @@ use v4l::{prelude::*, Format};
 
 const CAMERA_FRAME_DELAY: time::Duration = time::Duration::from_millis(500);
 const RETRY_DELAY: time::Duration = time::Duration::from_secs(5);
-const MAX_ATTEMPTS: i8 = std::i8::MAX;
+const MAX_ATTEMPTS: i8 = std::i8::MAX - 1;
 const DEVICE_MISSING_ERROR: i32 = -1;
 const INVALID_BUFFER_PIXEL_FORMAT_ERROR: i32 = -2;
 
