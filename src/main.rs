@@ -1,4 +1,4 @@
-mod camea_thread;
+mod camera_thread;
 mod canvas;
 mod scenes;
 mod frame_tick;
@@ -66,7 +66,7 @@ fn main() {
 
     if CAMERA_ON {
         let mut handle_vec = vec![]; // JoinHandles will go in here
-        let handle = thread::spawn(move || camea_thread::cam_thread_loop(camera_light_reading_clone));
+        let handle = thread::spawn(move || camera_thread::cam_thread_loop(camera_light_reading_clone));
         handle_vec.push(handle); // save the handle so we can call join on it outside of the loop
     }
 
