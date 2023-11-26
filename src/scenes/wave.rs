@@ -1,7 +1,7 @@
 use palette::{FromColor, Oklch, Srgb};
 use rand::Rng;
 
-use crate::{Canvas, FrameTick, Scene};
+use crate::{Canvas, frame_tick::FrameTick, Scene};
 
 const SEARCH_RADIUS: i32 = 2;
 const KERNEL_SIZE: usize = (SEARCH_RADIUS * 2 + 1) as usize;

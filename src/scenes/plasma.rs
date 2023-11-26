@@ -1,4 +1,4 @@
-use crate::{Canvas, FrameTick, Scene};
+use crate::{Canvas, frame_tick::FrameTick, Scene};
 
 pub struct PlasmaScene {
     speed: f32,
