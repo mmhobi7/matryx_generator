@@ -1,6 +1,6 @@
 use std::time;
 
-const FRAME_TIME: time::Duration = time::Duration::from_millis((1000 / 30) as u64);
+const FRAME_TIME: time::Duration = time::Duration::from_millis((1000.0 / 30.0) as u64);
 
 pub struct FrameTimer {
     prev_tick: Option<FrameTick>,
@@ -10,36 +10,31 @@ pub struct FrameTimer {
 pub struct FrameTick {
     pub start: time::Instant,
     pub instant: time::Instant,
-
     pub t: f32,
     pub dt: f32,
 }
 
 impl FrameTick {
-    fn from_start() -> FrameTick {
-        let now = time::Instant::now();
-
-        FrameTick {
-            start: now,
-            instant: now,
-            t: 0.0,
-            dt: 0.0,
-        }
-    }
-
-    fn from_prev(last_tick: &FrameTick) -> FrameTick {
-        let start = last_tick.start;
-        let instant = time::Instant::now();
-        let delta = last_tick.instant.elapsed();
-        let t = start.elapsed().as_secs_f32();
-        let dt = delta.as_secs_f32();
-
+    fn new(start: time::Instant, instant: time::Instant, t: f32,dt: f32) -> FrameTick {
         FrameTick {
             start,
             instant,
             t,
             dt,
         }
+    }
+
+    fn from_start() -> FrameTick {
+        let now = time::Instant::now();
+        FrameTick::new(now, now, 0.0, 0.0)
+    }
+
+    fn from_prev(last_tick: &FrameTick) -> FrameTick {
+        let start = last_tick.start;
+        let instant = time::Instant::now();
+        let t = start.elapsed().as_secs_f32();
+        let dt = last_tick.instant.elapsed().as_secs_f32();
+        FrameTick::new(start, instant, t, dt)
     }
 }
 
@@ -49,24 +44,20 @@ impl FrameTimer {
     }
 
     pub fn tick(&mut self) -> FrameTick {
-        if self.prev_tick.is_none() {
-            self.prev_tick = Some(FrameTick::from_start());
-            return self.prev_tick.unwrap();
-        } else {
-            self.prev_tick = Some(FrameTick::from_prev(self.prev_tick.as_ref().unwrap()))
-        }
+        self.prev_tick = Some(match self.prev_tick {
+            None => FrameTick::from_start(),
+            Some(prev_tick) => FrameTick::from_prev(&prev_tick),
+        });
 
         self.prev_tick.unwrap()
     }
 
     pub fn wait_for_next_frame(&self) {
-        if self.prev_tick.is_none() {
-            return;
-        }
-
-        let delta = self.prev_tick.unwrap().instant.elapsed();
-        if delta < FRAME_TIME {
-            std::thread::sleep(FRAME_TIME - delta);
+        if let Some(prev_tick) = self.prev_tick {
+            let delta = prev_tick.instant.elapsed();
+            if delta < FRAME_TIME {
+                std::thread::sleep(FRAME_TIME - delta);
+            }
         }
     }
 }
