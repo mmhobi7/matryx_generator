@@ -1,6 +1,6 @@
 use rand::{prelude::SliceRandom, Rng};
 
-use crate::{Canvas, FrameTick, Scene};
+use crate::{Canvas, frame_tick::FrameTick, Scene};
 
 #[derive(Copy, Clone, PartialEq)]
 struct Tile {

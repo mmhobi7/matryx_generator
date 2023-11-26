@@ -1,4 +1,4 @@
-use crate::{Canvas, FrameTick, Scene};
+use crate::{Canvas, frame_tick::FrameTick, Scene};
 use chrono::Local;
 use embedded_graphics::{geometry::Point, pixelcolor::Rgb888, prelude::*, text::Text};
 use u8g2_fonts::{fonts, U8g2TextStyle};
