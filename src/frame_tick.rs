@@ -2,12 +2,12 @@ use std::time;
 
 const FRAME_TIME: time::Duration = time::Duration::from_millis((1000 / 30) as u64);
 
-pub(crate) struct FrameTimer {
+pub struct FrameTimer {
     prev_tick: Option<FrameTick>,
 }
 
 #[derive(Copy, Clone, Debug)]
-pub(crate) struct FrameTick {
+pub struct FrameTick {
     pub start: time::Instant,
     pub instant: time::Instant,
 
