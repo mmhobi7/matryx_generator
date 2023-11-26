@@ -91,10 +91,10 @@ fn main() {
             } else {
                 shifter + 1.0
             };
-            canvas::filter_hue_shift(&mut canvas_wave, shifter);
             client.send_brightness(100);
-            canvas::filter_rotate_right(&mut canvas_wave);
+            canvas::filter_hue_shift(&mut canvas_wave, shifter);
             canvas::filter_bright_background(&mut canvas_wave, &mut canvas_clock, 0.1);
+            canvas::filter_rotate_right(&mut canvas_wave);
             client.send_frame(canvas_wave.pixels());
         }
         frame_timer.wait_for_next_frame();
